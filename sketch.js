@@ -74,23 +74,23 @@ function draw() {
   // 测试绘图代码，绘制手指之间的连线
   // strokeWeight(6); // 设置线条粗细
 
-  // const mano_1 = hands[0];
-  // if (!mano_1) return;
-  // const mano_1_pollice = mano_1.keypoints[4];
-  // const mano_1_indice = mano_1.keypoints[8];
-  // stroke(255, 0, 0); // 红色线条
-  // line(mano_1_pollice.x, mano_1_pollice.y, mano_1_indice.x, mano_1_indice.y);
+  const mano_1 = hands[0];
+  if (!mano_1) return;
+  const mano_1_pollice = mano_1.keypoints[4];
+  const mano_1_indice = mano_1.keypoints[8];
+  stroke(255, 0, 0); // 红色线条
+  line(mano_1_pollice.x, mano_1_pollice.y, mano_1_indice.x, mano_1_indice.y);
 
-  // const mano_2 = hands[1];
-  // if (!mano_2) return;
-  // const mano_2_pollice = mano_2.keypoints[4];
-  // const mano_2_indice = mano_2.keypoints[8];
-  // stroke(0, 0, 255); // 蓝色线条
-  // line(mano_2_pollice.x, mano_2_pollice.y, mano_2_indice.x, mano_2_indice.y);
+  const mano_2 = hands[1];
+  if (!mano_2) return;
+  const mano_2_pollice = mano_2.keypoints[4];
+  const mano_2_indice = mano_2.keypoints[8];
+  stroke(0, 0, 255); // 蓝色线条
+  line(mano_2_pollice.x, mano_2_pollice.y, mano_2_indice.x, mano_2_indice.y);
 
-  // stroke(255, 255, 0); // 黄色线条
-  // line(mano_1_pollice.x, mano_1_pollice.y, mano_2_pollice.x, mano_2_pollice.y);
+  stroke(255, 255, 0); // 黄色线条
+  line(mano_1_pollice.x, mano_1_pollice.y, mano_2_pollice.x, mano_2_pollice.y);
 
-  // stroke(0, 255, 0); // 绿色线条
-  // line(mano_1_indice.x, mano_1_indice.y, mano_2_indice.x, mano_2_indice.y);
+  stroke(0, 255, 0); // 绿色线条
+  line(mano_1_indice.x, mano_1_indice.y, mano_2_indice.x, mano_2_indice.y);
 }
