@@ -1,47 +1,42 @@
-let video; // 用于存储摄像头视频流
-
+let video;
 /** @type {ml5.HandPose} */
-let handPose; // 手部识别模型对象（ml5.js）
-
+let handPose;
 /** @type {ml5.Hand[]} */
-let hands = []; // 存储识别出的手部数据数组
+let hands = [];
 
 function preload() {
-  // 预加载阶段：加载手部识别模型，设置为左右镜像
+  // 加载手势识别模型
   handPose = ml5.handPose({
     flipped: true,
   });
 }
 
 function setup() {
-  const scale = 2; // 缩放比例
-  createCanvas(640 * scale, 480 * scale); // 创建画布，分辨率为 1280x960
+  const scale = 2;
+  createCanvas(640 * scale, 480 * scale);
 
-  // 创建摄像头视频并隐藏（不直接显示）
-  video = createCapture(VIDEO, { flipped: true }); // 同样设置镜像
-  video.size(width, height); // 设置视频大小与画布一致
-  video.hide(); // 隐藏默认视频显示
+  // 创建摄像头视频并隐藏
+  video = createCapture(VIDEO, { flipped: true });
+  video.size(width, height);
+  video.hide();
 
-  // 开始从摄像头视频中检测手部
+  // 开始检测手势
   handPose.detectStart(video, function (results) {
-    hands = results; // 每帧更新识别到的手部数据
+    hands = results;
   });
 }
 
 function draw() {
-  // 每一帧绘制摄像头图像
+  // 显示视频画面
   image(video, 0, 0, width, height);
 
-  // 获取前两只识别到的手
   const mano_1 = hands[0];
   const mano_2 = hands[1];
 
   if (mano_1 && mano_2) {
-    // 如果两只手都检测到了，提取每只手的大拇指（点4）和食指（点8）坐标
     const pollice_1 = mano_1.keypoints[4];
     const indice_1 = mano_1.keypoints[8];
 
-    // 计算第一只手的大拇指与食指之间的距离
     const distanza_mano_1 = dist(
       pollice_1.x,
       pollice_1.y,
@@ -52,7 +47,6 @@ function draw() {
     const pollice_2 = mano_2.keypoints[4];
     const indice_2 = mano_2.keypoints[8];
 
-    // 计算第二只手的大拇指与食指之间的距离
     const distanza_mano_2 = dist(
       pollice_2.x,
       pollice_2.y,
@@ -60,37 +54,45 @@ function draw() {
       indice_2.y
     );
 
-    // 使用第一只手的手指距离作为字体大小，第二只手的距离控制文字颜色的红色分量
-    textAlign("center"); // 文字居中对齐
-    textSize(distanza_mano_1); // 设置文字大小
-    fill(distanza_mano_2, 0, 0); // 设置文字颜色
-    text("UNDEFINE", width / 2, height); // 显示文字
+    // 显示动态文字
+    textAlign("center");
+    textSize(distanza_mano_1);
+    fill(distanza_mano_2, 0, 0);
+    text("UNDEFINE", width / 2, height); // ✅ 替换 Ciao 为 UNDEFINE
 
-    // 绘制两只手的大拇指与食指之间的线
+    // 画原始两条线：拇指到食指
     line(pollice_1.x, pollice_1.y, indice_1.x, indice_1.y);
     line(pollice_2.x, pollice_2.y, indice_2.x, indice_2.y);
+
+    // ✅ 新增功能：为每对相同手指画动态波浪线
+    for (let i = 0; i < mano_1.keypoints.length; i++) {
+      const pt1 = mano_1.keypoints[i];
+      const pt2 = mano_2.keypoints[i];
+      drawWavyLine(pt1.x, pt1.y, pt2.x, pt2.y, i);
+    }
   }
+}
 
-  // 测试绘图代码，绘制手指之间的连线
-  // strokeWeight(6); // 设置线条粗细
+// ✅ 新增函数：绘制动态波浪线
+function drawWavyLine(x1, y1, x2, y2, index) {
+  const steps = 60; // 插值精度
+  const amp = 10; // 振幅（波高）
+  const freq = 6; // 频率（波密度）
+  const speed = 0.1; // 动画速度（越大越快）
 
-  const mano_1 = hands[0];
-  if (!mano_1) return;
-  const mano_1_pollice = mano_1.keypoints[4];
-  const mano_1_indice = mano_1.keypoints[8];
-  stroke(255, 0, 0); // 红色线条
-  line(mano_1_pollice.x, mano_1_pollice.y, mano_1_indice.x, mano_1_indice.y);
+  strokeWeight(2);
+  // 每个手指用不同颜色
+  stroke((index * 50) % 255, (index * 80) % 255, (index * 110) % 255);
+  noFill();
 
-  const mano_2 = hands[1];
-  if (!mano_2) return;
-  const mano_2_pollice = mano_2.keypoints[4];
-  const mano_2_indice = mano_2.keypoints[8];
-  stroke(0, 0, 255); // 蓝色线条
-  line(mano_2_pollice.x, mano_2_pollice.y, mano_2_indice.x, mano_2_indice.y);
-
-  stroke(255, 255, 0); // 黄色线条
-  line(mano_1_pollice.x, mano_1_pollice.y, mano_2_pollice.x, mano_2_pollice.y);
-
-  stroke(0, 255, 0); // 绿色线条
-  line(mano_1_indice.x, mano_1_indice.y, mano_2_indice.x, mano_2_indice.y);
+  beginShape();
+  for (let i = 0; i <= steps; i++) {
+    const t = i / steps;
+    const x = lerp(x1, x2, t);
+    // 加上 frameCount 实现“流动”的波动
+    const y =
+      lerp(y1, y2, t) + sin(t * freq * TWO_PI + frameCount * speed) * amp;
+    curveVertex(x, y);
+  }
+  endShape();
 }
