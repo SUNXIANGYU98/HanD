@@ -63,7 +63,7 @@ function draw() {
     // 使用第一只手的手指距离作为字体大小，第二只手的距离控制文字颜色的红色分量
     textAlign("center"); // 文字居中对齐
     textSize(distanza_mano_1); // 设置文字大小
-    fill(distanza_mano_2, 100, 0); // 设置文字颜色（红色根据距离变化）
+    fill(distanza_mano_2, 0, 0); // 设置文字颜色（红色根据距离变化）
     text("UNDEFINE", width / 2, height); // 显示文字“Ciao”在画布底部居中
 
     // 绘制两只手的大拇指与食指之间的线
